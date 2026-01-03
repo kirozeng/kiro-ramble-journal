@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiro. | Visual Stories & Wanderings</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="A personal photo journal capturing visual stories and wanderings. Photography portfolio featuring moments, travel journals, and creative work.">
+    <meta name="keywords" content="photography, photo journal, travel, moments, visual stories, portfolio">
+    <meta name="author" content="Kiro">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Kiro. | Visual Stories & Wanderings">
+    <meta property="og:description" content="A personal photo journal capturing visual stories and wanderings.">
+    <meta property="og:image" content="/assets/profile.jpg">
+    <meta property="og:url" content="">
+    <meta property="og:site_name" content="Kiro.">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Kiro. | Visual Stories & Wanderings">
+    <meta name="twitter:description" content="A personal photo journal capturing visual stories and wanderings.">
+    <meta name="twitter:image" content="/assets/profile.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+    <link rel="apple-touch-icon" href="/assets/profile.jpg">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#faf9f6">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #faf9f6;
+            --text-main: #2c2c2c;
+            --text-muted: #666;
+            --accent-color: #1a1a1a;
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow-y: scroll; /* 始终显示滚动条，防止页面切换时宽度跳动 */
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #bbb; }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: rgba(250, 249, 246, 0.92);
+            backdrop-filter: blur(12px);
+            padding: 0 3rem;
+            z-index: 10000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid transparent; /* 始终有 border，只改颜色 */
+        }
+
+        header.scrolled {
+            border-bottom-color: rgba(0,0,0,0.05);
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        .tagline {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-top: 0.3rem;
+        }
+
+        nav {
+            display: flex;
+            gap: 2.5rem;
+            flex-shrink: 0;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: color 0.3s ease;
+            position: relative;
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+
+        header nav a:hover, header nav a.active { color: var(--text-main); }
+
+        header nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--text-main);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        header nav a.active::after {
+            opacity: 1;
+        }
+
+        .content {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 7rem 1rem 3rem;
+            min-height: 100vh;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .content.fade { 
+            opacity: 0; 
+            transform: translateY(8px);
+        }
+
+        /* ==================== MOMENTS: Dense Photo Wall ==================== */
+        .photo-wall {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+        }
+
+        .photo-item {
+            position: relative;
+            aspect-ratio: 1;
+            overflow: hidden;
+            cursor: pointer;
+            background: #e8e8e8;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .photo-item:hover img {
+            transform: scale(1.08);
+        }
+
+        .photo-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1rem;
+            color: #fff;
+        }
+
+        .photo-item:hover .photo-overlay { opacity: 1; }
+
+        .photo-overlay .date {
+            font-size: 0.8rem;
+            font-family: var(--font-body);
+            letter-spacing: 0.02em;
+        }
+
+        .photo-overlay .camera {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 0.3rem;
+            font-family: var(--font-body);
+        }
+
+        /* ==================== Lightbox ==================== */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .lightbox.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 2px;
+        }
+
+        .lightbox-info {
+            color: #fff;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .lightbox-info .lb-date {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
+        }
+
+        .lightbox-info .lb-camera {
+            color: #aaa;
+            margin-top: 0.3rem;
+            font-size: 0.8rem;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .lightbox-close:hover { opacity: 1; }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 3rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+            padding: 1rem;
+        }
+
+        .lightbox-nav:hover { opacity: 1; }
+        .lightbox-prev { left: -80px; }
+        .lightbox-next { right: -80px; }
+
+        /* ==================== Journal List ==================== */
+        .journal-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6rem;
+        }
+
+        .journal-entry {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .journal-entry:nth-child(even) { direction: rtl; }
+        .journal-entry:nth-child(even) .journal-info { direction: ltr; }
+
+        .journal-cover-wrapper {
+            position: relative;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .journal-cover-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .journal-entry:hover .journal-cover-wrapper img { transform: scale(1.03); }
+
+        .journal-info { padding: 1rem; }
+
+        .journal-date {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #999;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .journal-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 400;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .journal-desc {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 300;
+            line-height: 1.8;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .read-more {
+            margin-top: 2rem;
+            display: inline-block;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            text-decoration: none;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 2px;
+            transition: border-color 0.3s;
+        }
+
+        .journal-entry:hover .read-more { border-bottom-color: var(--text-main); }
+
+        /* ==================== Journal Detail ==================== */
+        .journal-detail {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-nav { 
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+        .back-nav a {
+            text-decoration: none;
+            color: #888;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            transition: color 0.3s;
+        }
+        .back-nav a:hover { color: var(--text-main); }
+
+        .journal-hero {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            min-height: 500px;
+            max-height: 800px;
+            overflow: hidden;
+            margin-bottom: 4rem;
+        }
+
+        .journal-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .journal-hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 40%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 4rem;
+            color: #fff;
+        }
+
+        .journal-hero-meta {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .journal-hero-title {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            font-weight: 400;
+            line-height: 1.1;
+            max-width: 800px;
+        }
+
+        .journal-story {
+            max-width: 680px;
+            margin: 0 auto 5rem;
+            padding: 0 2rem;
+        }
+
+        .journal-story-text {
+            font-size: 1.2rem;
+            line-height: 2;
+            color: #444;
+            font-weight: 300;
+        }
+
+        .journal-story-text::first-letter {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            float: left;
+            line-height: 1;
+            margin-right: 0.5rem;
+            margin-top: 0.1rem;
+            color: var(--text-main);
+        }
+
+        .journal-gallery-title {
+            text-align: center;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: #999;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .journal-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 4rem;
+        }
+
+        .journal-gallery .photo-item {
+            aspect-ratio: 1;
+        }
+
+        .journal-gallery .photo-item:first-child {
+            grid-column: span 2;
+            grid-row: span 2;
+            aspect-ratio: auto;
+        }
+
+        /* ==================== About ==================== */
+        .about-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1000px;
+            margin: 4rem auto;
+            align-items: center;
+        }
+
+        .about-image {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            object-position: center top;
+        }
+
+        .about-content h2 {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .about-text {
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: #555;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .social-link {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: opacity 0.3s;
+        }
+
+        .social-link:hover { opacity: 0.6; }
+
+        .social-link svg {
+            flex-shrink: 0;
+        }
+
+        .gear-section {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+
+        .gear-section h3 {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 1.2rem;
+            color: var(--text-main);
+        }
+
+        .gear-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .gear-item {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .gear-label {
+            color: #999;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            min-width: 60px;
+        }
+
+        .gear-value {
+            color: #444;
+        }
+
+        /* ==================== Responsive ==================== */
+        @media (max-width: 1200px) {
+            .photo-wall { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                height: auto;
+                padding: 0.8rem 1rem;
+                flex-direction: row;
+                justify-content: space-between;
+                border-bottom: 1px solid rgba(0,0,0,0.05);
+            }
+
+            .brand { align-items: flex-start; }
+            .logo { font-size: 1.6rem; }
+            .tagline { font-size: 0.65rem; display: none; }
+
+            nav { gap: 1.2rem; }
+            nav a { font-size: 0.75rem; padding-bottom: 4px; }
+
+            .content { 
+                padding: 5rem 0.5rem 2rem;
+                min-height: calc(100vh - 60px);
+            }
+
+            .photo-wall {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2px;
+            }
+
+            .photo-overlay { padding: 0.6rem; }
+            .photo-overlay .date { font-size: 0.7rem; }
+            .photo-overlay .camera { font-size: 0.65rem; }
+
+            /* Journal list mobile */
+            .journal-container { gap: 3rem; margin: 1rem auto; }
+            .journal-entry {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .journal-entry:nth-child(even) { direction: ltr; }
+            .journal-info { padding: 0.5rem; }
+            .journal-date { margin-bottom: 0.5rem; font-size: 0.75rem; }
+            .journal-title { font-size: 1.6rem; margin-bottom: 0.8rem; }
+            .journal-desc { font-size: 0.9rem; -webkit-line-clamp: 2; }
+            .read-more { margin-top: 1rem; font-size: 0.8rem; }
+            
+            /* Journal detail mobile */
+            .journal-hero { height: 45vh; min-height: 280px; }
+            .journal-hero-overlay { padding: 1.5rem; }
+            .journal-hero-meta { font-size: 0.7rem; }
+            .journal-hero-title { font-size: 2rem; }
+            .journal-story { padding: 0 1rem; margin-bottom: 3rem; }
+            .journal-story-text { font-size: 1rem; line-height: 1.8; }
+            .journal-story-text::first-letter { font-size: 3rem; }
+            .journal-gallery-title { font-size: 1.2rem; margin-bottom: 1rem; }
+            .journal-gallery { 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 4px;
+                margin-bottom: 2rem;
+            }
+            .journal-gallery .photo-item:first-child { grid-column: span 2; }
+            .back-nav { padding: 0 0.5rem; margin-bottom: 1rem; }
+            .back-nav a { font-size: 0.8rem; }
+
+            /* About mobile */
+            .about-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 0;
+                margin: 2rem auto;
+            }
+
+            .about-image {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                aspect-ratio: 3/4;
+                border-radius: 0;
+            }
+            
+            .about-content {
+                padding: 0 1rem;
+            }
+
+            .about-content h2 { font-size: 2rem; margin-bottom: 1.5rem; }
+            .about-text { font-size: 0.95rem; line-height: 1.8; }
+            .gear-section { margin-top: 2rem; padding-top: 1.5rem; }
+            .gear-section h3 { font-size: 1.1rem; }
+            .gear-item { font-size: 0.85rem; }
+            .social-links { 
+                flex-wrap: wrap; 
+                gap: 1rem;
+                margin-top: 2rem;
+            }
+            .social-link { font-size: 0.85rem; }
+
+            /* Lightbox mobile */
+            .lightbox-content { max-width: 100vw; max-height: 100vh; padding: 0 10px; }
+            .lightbox-content img { max-height: 70vh; border-radius: 0; }
+            .lightbox-close { 
+                position: fixed; 
+                top: 15px; 
+                right: 15px; 
+                font-size: 1.8rem;
+                background: rgba(0,0,0,0.5);
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .lightbox-nav { display: none; }
+            .lightbox-info { font-size: 0.85rem; padding: 0 1rem; }
+            .lightbox-info .lb-date { font-size: 0.9rem; }
+            .lightbox-info .lb-camera { font-size: 0.75rem; }
+        }
+
+        @media (max-width: 480px) {
+            .logo { font-size: 1.4rem; }
+            nav { gap: 0.8rem; }
+            nav a { font-size: 0.7rem; letter-spacing: 0.05em; }
+            
+            .photo-wall { grid-template-columns: repeat(2, 1fr); }
+            
+            .journal-title { font-size: 1.4rem; }
+            .journal-hero-title { font-size: 1.6rem; }
+            
+            .about-content h2 { font-size: 1.6rem; }
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .photo-item .photo-overlay { opacity: 1; background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 40%); }
+            .photo-item:active img { transform: scale(1.02); }
+            .journal-entry:active .journal-cover-wrapper img { transform: scale(1.02); }
+            nav a:active { opacity: 0.6; }
+        }
+
+        /* ==================== Mobile Drawer Navigation ==================== */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            margin-right: -10px;
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--text-main);
+            margin: 5px 0;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 1px;
+            transform-origin: center;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* 遮罩层 */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s ease;
+            z-index: 9998;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 侧边抽屉 */
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 200px;
+            max-width: 65vw;
+            height: 100%;
+            background: rgba(250, 249, 246, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            z-index: 9999;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: none;
+        }
+
+        .drawer.active {
+            transform: translateX(0);
+            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .drawer-nav {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .drawer-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1.2rem 2rem;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-nav a::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background: var(--text-main);
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .drawer-nav a:hover {
+            color: var(--text-main);
+        }
+
+        .drawer-nav a.active {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .drawer-nav a.active::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        @media (max-width: 768px) {
+            /* 显示汉堡菜单按钮 */
+            .menu-toggle {
+                display: block;
+            }
+            
+            /* 隐藏顶部导航 */
+            header nav {
+                display: none;
+            }
+            
+            header {
+                justify-content: space-between;
+            }
+            
+            .brand {
+                align-items: flex-start;
+            }
+        }
+
+        /* 禁止 body 滚动 - 当抽屉打开时 */
+        body.drawer-open {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <header id="main-header">
+        <a href="#journal" class="brand">
+            <span class="logo">Kiro.</span>
+            <span class="tagline">Visual Stories & Wanderings</span>
+        </a>
+        <nav>
+            <a href="#journal">Journal</a>
+            <a href="#moments">Moments</a>
+            <a href="#about">About</a>
+        </nav>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </header>
+
+    <!-- Drawer Overlay -->
+    <div class="drawer-overlay" id="drawer-overlay"></div>
+
+    <!-- Drawer Navigation -->
+    <aside class="drawer" id="drawer">
+        <nav class="drawer-nav">
+            <a href="#journal" data-page="journal">Journal</a>
+            <a href="#moments" data-page="moments">Moments</a>
+            <a href="#about" data-page="about">About</a>
+        </nav>
+    </aside>
+
+    <main id="content" class="content"></main>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox">
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightbox-close">&times;</button>
+            <button class="lightbox-nav lightbox-prev" id="lightbox-prev">&#8249;</button>
+            <button class="lightbox-nav lightbox-next" id="lightbox-next">&#8250;</button>
+            <img id="lightbox-img" src="" alt="">
+            <div class="lightbox-info">
+                <div class="lb-date" id="lb-date"></div>
+                <div class="lb-camera" id="lb-camera"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class App {
+            constructor() {
+                this.content = document.getElementById('content');
+                this.header = document.getElementById('main-header');
+                this.lightbox = document.getElementById('lightbox');
+                this.currentPage = '';
+                this.currentSubPage = '';
+                this.photos = [];
+                this.currentPhotoIndex = 0;
+
+                window.addEventListener('scroll', () => {
+                    this.header.classList.toggle('scrolled', window.scrollY > 50);
+                });
+
+                // 顶部导航点击
+                document.querySelectorAll('header nav a').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = e.target.getAttribute('href').substring(1);
+                        window.location.hash = page;
+                    });
+                });
+
+                // 抽屉导航相关元素
+                this.menuToggle = document.getElementById('menu-toggle');
+                this.drawer = document.getElementById('drawer');
+                this.drawerOverlay = document.getElementById('drawer-overlay');
+
+                // 汉堡菜单点击（检查元素是否存在）
+                if (this.menuToggle) {
+                    this.menuToggle.addEventListener('click', () => this.toggleDrawer());
+                }
+
+                // 遮罩层点击关闭
+                if (this.drawerOverlay) {
+                    this.drawerOverlay.addEventListener('click', () => this.closeDrawer());
+                }
+
+                // 抽屉导航点击
+                document.querySelectorAll('.drawer-nav a').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = link.dataset.page;
+                        this.closeDrawer();
+                        setTimeout(() => {
+                            window.location.hash = page;
+                        }, 150);
+                    });
+                });
+
+                document.querySelector('.brand').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.hash = '#journal';
+                });
+
+                window.addEventListener('popstate', () => this.handleHash());
+                window.addEventListener('hashchange', () => this.handleHash());
+
+                // Lightbox keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (!this.lightbox.classList.contains('active')) return;
+                    if (e.key === 'Escape') this.closeLightbox();
+                    if (e.key === 'ArrowLeft') this.prevPhoto();
+                    if (e.key === 'ArrowRight') this.nextPhoto();
+                });
+
+                // Close lightbox on background click
+                this.lightbox.addEventListener('click', (e) => {
+                    if (e.target === this.lightbox) this.closeLightbox();
+                });
+
+                // Lightbox button events
+                document.getElementById('lightbox-close').addEventListener('click', () => this.closeLightbox());
+                document.getElementById('lightbox-prev').addEventListener('click', () => this.prevPhoto());
+                document.getElementById('lightbox-next').addEventListener('click', () => this.nextPhoto());
+
+                // Touch swipe for lightbox
+                let touchStartX = 0;
+                let touchEndX = 0;
+                this.lightbox.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+                this.lightbox.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    const diff = touchStartX - touchEndX;
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) this.nextPhoto();
+                        else this.prevPhoto();
+                    }
+                }, { passive: true });
+
+                this.handleHash();
+            }
+
+            handleHash() {
+                const hash = window.location.hash.substring(1) || 'journal';
+                const parts = hash.split('/');
+                this.navigate(parts[0], parts.slice(1).join('/'), false);
+            }
+
+            toggleDrawer() {
+                const isOpen = this.drawer.classList.contains('active');
+                if (isOpen) {
+                    this.closeDrawer();
+                } else {
+                    this.openDrawer();
+                }
+            }
+
+            openDrawer() {
+                this.menuToggle.classList.add('active');
+                this.drawer.classList.add('active');
+                this.drawerOverlay.classList.add('active');
+                document.body.classList.add('drawer-open');
+            }
+
+            closeDrawer() {
+                this.menuToggle.classList.remove('active');
+                this.drawer.classList.remove('active');
+                this.drawerOverlay.classList.remove('active');
+                document.body.classList.remove('drawer-open');
+            }
+
+            async navigate(page, subPage = '', addToHistory = true) {
+                // 更新顶部导航的 active 状态
+                document.querySelectorAll('header nav a').forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === `#${page}`);
+                });
+                
+                // 更新抽屉导航的 active 状态
+                document.querySelectorAll('.drawer-nav a').forEach(link => {
+                    link.classList.toggle('active', link.dataset.page === page);
+                });
+
+                if (addToHistory) {
+                    window.history.pushState(null, '', subPage ? `#${page}/${subPage}` : `#${page}`);
+                }
+
+                this.content.classList.add('fade');
+                await new Promise(r => setTimeout(r, 400));
+
+                this.currentPage = page;
+                this.currentSubPage = subPage;
+
+                if (page === 'journal') await this.renderJournal(subPage);
+                else if (page === 'moments') await this.renderMoments();
+                else if (page === 'about') await this.renderAbout();
+                else await this.renderJournal();
+
+                window.scrollTo(0, 0);
+                this.content.classList.remove('fade');
+            }
+
+            async renderMoments() {
+                try {
+                    const response = await fetch('/api/photos');
+                    this.photos = await response.json();
+                    this.photos.sort((a, b) => new Date(b.dateTaken) - new Date(a.dateTaken));
+
+                    this.content.innerHTML = `
+                        <div class="photo-wall">
+                            ${this.photos.map((photo, index) => `
+                                <div class="photo-item" data-photo-index="${index}">
+                                    <img src="${photo.url}" loading="lazy" alt="">
+                                    <div class="photo-overlay">
+                                        <div class="date">${new Date(photo.dateTaken).toLocaleDateString('zh-CN', {year: 'numeric', month: 'short', day: 'numeric'})}</div>
+                                        <div class="camera">${photo.camera}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                    // 使用事件委托绑定点击事件
+                    this.content.querySelectorAll('.photo-item[data-photo-index]').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const index = parseInt(item.dataset.photoIndex);
+                            this.openLightbox(index);
+                        });
+                    });
+                } catch (error) {
+                    console.error('Error in renderMoments:', error);
+                    this.content.innerHTML = '<p>Error loading photos.</p>';
+                }
+            }
+
+            openLightbox(index) {
+                this.currentPhotoIndex = index;
+                this.updateLightbox();
+                this.lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            closeLightbox() {
+                this.lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            updateLightbox() {
+                const photo = this.photos[this.currentPhotoIndex];
+                document.getElementById('lightbox-img').src = photo.url;
+                document.getElementById('lb-date').textContent = new Date(photo.dateTaken).toLocaleDateString('zh-CN', {year: 'numeric', month: 'long', day: 'numeric'});
+                document.getElementById('lb-camera').textContent = `${photo.camera}${photo.lens ? ' · ' + photo.lens : ''}`;
+            }
+
+            prevPhoto() {
+                this.currentPhotoIndex = (this.currentPhotoIndex - 1 + this.photos.length) % this.photos.length;
+                this.updateLightbox();
+            }
+
+            nextPhoto() {
+                this.currentPhotoIndex = (this.currentPhotoIndex + 1) % this.photos.length;
+                this.updateLightbox();
+            }
+
+            async renderJournal(journalId) {
+                if (journalId) await this.renderJournalDetail(journalId);
+                else await this.renderJournalList();
+            }
+
+            async renderJournalList() {
+                try {
+                    const response = await fetch('/api/journals');
+                    const journals = await response.json();
+
+                    if (journals.length === 0) {
+                        this.content.innerHTML = '<p style="text-align:center; color:#888; padding:4rem;">No journals yet.</p>';
+                        return;
+                    }
+
+                    this.content.innerHTML = `
+                        <div class="journal-container">
+                            ${journals.map(journal => `
+                                <article class="journal-entry" data-journal-id="${journal.id}">
+                                    <div class="journal-cover-wrapper">
+                                        <img src="${journal.cover}" alt="${journal.title}">
+                                    </div>
+                                    <div class="journal-info">
+                                        <span class="journal-date">${new Date(journal.date).toLocaleDateString('zh-CN', {year: 'numeric', month: 'long'})}</span>
+                                        <h2 class="journal-title">${journal.title}</h2>
+                                        <p class="journal-desc">${journal.description}</p>
+                                        <span class="read-more">Read Story</span>
+                                    </div>
+                                </article>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                    // 使用事件委托绑定点击事件
+                    this.content.querySelectorAll('.journal-entry[data-journal-id]').forEach(entry => {
+                        entry.addEventListener('click', () => {
+                            const journalId = entry.dataset.journalId;
+                            this.navigate('journal', journalId);
+                        });
+                    });
+                } catch (e) {
+                    console.error('Error in renderJournalList:', e);
+                    this.content.innerHTML = '<p>Error loading journals.</p>';
+                }
+            }
+
+            async renderJournalDetail(id) {
+                try {
+                    const response = await fetch(`/api/journals/${id}`);
+                    const data = await response.json();
+                    
+                    // Store photos for lightbox in journal detail
+                    this.photos = data.photos;
+                    
+                    // Use cover image for hero, or first photo
+                    const heroImage = data.cover ? data.cover.replace('cover.jpg', 'cover.jpg') : (data.photos[0]?.url || '');
+
+                    this.content.innerHTML = `
+                        <article class="journal-detail">
+                            <div class="back-nav">
+                                <a href="#journal">← Back to Journals</a>
+                            </div>
+                            
+                            <div class="journal-hero">
+                                <img src="${heroImage}" alt="${data.title}">
+                                <div class="journal-hero-overlay">
+                                    <div class="journal-hero-meta">${new Date(data.date).toLocaleDateString('zh-CN', {year: 'numeric', month: 'long', day: 'numeric'})}</div>
+                                    <h1 class="journal-hero-title">${data.title}</h1>
+                                </div>
+                            </div>
+                            
+                            <div class="journal-story">
+                                <p class="journal-story-text">${data.description}</p>
+                            </div>
+                            
+                            <div class="journal-gallery-title">Gallery</div>
+                            
+                            <div class="journal-gallery">
+                                ${data.photos.map((photo, index) => `
+                                    <div class="photo-item" data-photo-index="${index}">
+                                        <img src="${photo.url}" loading="lazy" alt="">
+                                        <div class="photo-overlay">
+                                            <div class="date">${new Date(photo.dateTaken).toLocaleDateString('zh-CN', {month: 'short', day: 'numeric'})}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </article>
+                    `;
+                    
+                    // 使用事件委托绑定点击事件
+                    this.content.querySelectorAll('.journal-gallery .photo-item[data-photo-index]').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const index = parseInt(item.dataset.photoIndex);
+                            this.openLightbox(index);
+                        });
+                    });
+                } catch (e) {
+                    console.error('Error in renderJournalDetail:', e);
+                    this.content.innerHTML = '<p>Journal not found.</p>';
+                }
+            }
+
+            async renderAbout() {
+                try {
+                    const res = await fetch('/api/about');
+                    const data = await res.json();
+                    
+                    const gearHtml = data.gear && data.gear.length > 0 
+                        ? data.gear.map(g => `
+                            <div class="gear-item">
+                                <span class="gear-label">${g.type}</span>
+                                <span class="gear-value">${g.name}</span>
+                            </div>
+                        `).join('')
+                        : '<p style="color:#888">No gear listed</p>';
+                    
+                    this.content.innerHTML = `
+                        <div class="about-layout">
+                            <img src="/assets/profile.jpg" class="about-image" alt="${data.name}">
+                            <div class="about-content">
+                                <h2>About ${data.name}</h2>
+                                <div class="about-text">
+                                    <p>${data.bio || ''}</p>
+                                    ${data.bio2 ? `<p>${data.bio2}</p>` : ''}
+                                </div>
+                                
+                                <div class="gear-section">
+                                    <h3>My Gear</h3>
+                                    <div class="gear-list">${gearHtml}</div>
+                                </div>
+                                
+                                <div class="social-links">
+                                    ${data.social?.email ? `
+                                    <a href="mailto:${data.social.email}" class="social-link">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                                            <path d="M22 6L12 13L2 6"/>
+                                        </svg>
+                                        Email
+                                    </a>` : ''}
+                                    ${data.social?.instagram ? `
+                                    <a href="https://instagram.com/${data.social.instagram}" target="_blank" class="social-link">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <rect x="2" y="2" width="20" height="20" rx="5"/>
+                                            <circle cx="12" cy="12" r="4"/>
+                                            <circle cx="18" cy="6" r="1.5" fill="currentColor"/>
+                                        </svg>
+                                        Instagram
+                                    </a>` : ''}
+                                    ${data.social?.twitter ? `
+                                    <a href="https://x.com/${data.social.twitter}" target="_blank" class="social-link">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                        </svg>
+                                        X
+                                    </a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } catch (e) {
+                    this.content.innerHTML = '<p>Error loading about info.</p>';
+                }
+            }
+        }
+
+        // 创建全局 app 实例
+        let app;
+        try {
+            app = new App();
+        } catch (e) {
+            console.error('App initialization failed:', e);
+        }
+    </script>
+</body>
+</html>

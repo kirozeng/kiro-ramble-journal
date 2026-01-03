@@ -1,0 +1,36 @@
+{
+  "name": "Kiro",
+  "bio": "Hi, I'm Kiro. I capture moments and stories through my lens. This journal is a collection of my visual ramblings — from everyday street corners to distant landscapes.",
+  "bio2": "I believe that photography is not just about pressing the shutter, but about preserving the feeling of a fleeting moment. Whether it's the play of light in a quiet alley or the grandeur of a mountain range, I try to document it all.",
+  "gear": [
+    {
+      "type": "Camera",
+      "name": "Fujifilm X-T1"
+    },
+    {
+      "type": "Camera",
+      "name": "Lecia Q2"
+    },
+    {
+      "type": "Lens",
+      "name": "XF 23mm f/1.4 R"
+    },
+    {
+      "type": "Lens",
+      "name": "XF 16-55mm f/2.8 R LM WR"
+    },
+    {
+      "type": "Lens",
+      "name": "XF 100-400mm f/4.5-5.6 R LM OIS WR"
+    },
+    {
+      "type": "Mobile",
+      "name": "iPhone 15 Pro Max"
+    }
+  ],
+  "social": {
+    "email": "hello@kiro.me",
+    "instagram": "",
+    "twitter": ""
+  }
+}

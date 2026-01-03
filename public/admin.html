@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiro. Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Login screen */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+        }
+
+        .login-box {
+            background: #fff;
+            padding: 3rem 2.5rem;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .login-box h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .login-box p {
+            color: #888;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .login-box .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 1rem;
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .login-box button:hover {
+            background: #333;
+        }
+
+        .login-error {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .admin-wrapper {
+            display: none;
+        }
+
+        .admin-wrapper.active {
+            display: block;
+        }
+
+        .admin-header {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-header h1 {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .admin-header a {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .admin-header a:hover { color: #fff; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            padding: 0.8rem 1.5rem;
+            background: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .tab:hover { background: #eee; }
+        .tab.active { background: #1a1a1a; color: #fff; }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        .section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .btn-primary:hover { background: #333; }
+
+        .btn-danger {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        .btn-danger:hover { background: #cc0000; }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .upload-zone:hover { border-color: #999; background: #fafafa; }
+        .upload-zone.dragover { border-color: #1a1a1a; background: #f0f0f0; }
+
+        .upload-zone input { display: none; }
+
+        .upload-zone p {
+            color: #888;
+            margin-top: 0.5rem;
+        }
+
+        /* Photo Grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .photo-thumb {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #eee;
+        }
+
+        .photo-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-thumb .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            background: rgba(255,0,0,0.8);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 1rem;
+        }
+
+        .photo-thumb:hover .delete-btn { opacity: 1; }
+
+        /* Journal List */
+        .journal-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .journal-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: #fafafa;
+            border-radius: 8px;
+            align-items: center;
+        }
+
+        .journal-item img {
+            width: 100px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .journal-item-info { flex: 1; }
+
+        .journal-item-info h3 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .journal-item-info p {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .journal-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .form-group textarea { min-height: 100px; resize: vertical; }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1a1a1a;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 { font-size: 1.2rem; }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: #1a1a1a;
+            color: #fff;
+            border-radius: 8px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+        }
+
+        /* ==================== Mobile Responsive ==================== */
+        @media (max-width: 768px) {
+            .admin-header {
+                padding: 0.8rem 1rem;
+            }
+            
+            .admin-header h1 { font-size: 1rem; }
+            .admin-header a { font-size: 0.8rem; }
+
+            .container { padding: 1rem; }
+
+            .tabs {
+                display: flex;
+                gap: 0.5rem;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+                margin-bottom: 1rem;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .tab {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            .section {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+            }
+
+            .section-header { 
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+
+            .section h2 { font-size: 1rem; }
+
+            .upload-zone {
+                padding: 2rem 1rem;
+            }
+
+            .upload-zone p { font-size: 0.8rem; }
+
+            .photo-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+
+            .photo-thumb .delete-btn {
+                opacity: 1;
+                width: 24px;
+                height: 24px;
+                font-size: 0.9rem;
+                top: 4px;
+                right: 4px;
+            }
+
+            /* Journal list mobile */
+            .journal-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+
+            .journal-item img {
+                width: 100%;
+                height: 150px;
+                border-radius: 6px;
+            }
+
+            .journal-item-info { width: 100%; }
+            .journal-item-info h3 { font-size: 1.1rem; }
+
+            .journal-item-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            /* Form mobile */
+            .form-group label { font-size: 0.85rem; }
+            
+            .form-group input,
+            .form-group textarea {
+                padding: 0.7rem;
+                font-size: 16px; /* Prevent iOS zoom */
+            }
+
+            /* Modal mobile */
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+                max-height: 85vh;
+                border-radius: 12px 12px 0 0;
+                position: fixed;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .modal-header h2 { font-size: 1.1rem; }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .modal-actions .btn {
+                width: 100%;
+                padding: 0.9rem;
+            }
+
+            /* Journal detail modal mobile */
+            #journal-detail-modal .modal-content {
+                max-width: 100%;
+            }
+
+            #journal-detail-modal .modal-content > div:first-of-type {
+                grid-template-columns: 1fr;
+            }
+
+            /* About profile photo mobile */
+            #about-panel .section:first-child > div {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #about-panel .section:first-child > div > div:first-child {
+                width: 100px;
+                height: 100px;
+            }
+
+            /* Gear list mobile */
+            #gear-list > div {
+                flex-wrap: wrap;
+            }
+
+            #gear-list input:first-child {
+                width: 80px !important;
+            }
+
+            /* Toast mobile */
+            .toast {
+                bottom: 1rem;
+                right: 1rem;
+                left: 1rem;
+                text-align: center;
+            }
+
+            /* Buttons */
+            .btn { 
+                padding: 0.7rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .btn-small {
+                padding: 0.5rem 0.7rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .photo-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tabs { gap: 0.3rem; }
+            .tab { padding: 0.5rem 0.8rem; font-size: 0.8rem; }
+        }
+
+        /* Touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .btn:active { opacity: 0.8; transform: scale(0.98); }
+            .tab:active { opacity: 0.8; }
+            .upload-zone:active { background: #f5f5f5; }
+            .photo-thumb:active { opacity: 0.8; }
+        }
+
+        /* Safe area for notched phones */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .modal-content {
+                padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+            }
+            .toast {
+                bottom: calc(1rem + env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-box">
+            <h1>📷 Kiro.</h1>
+            <p>Admin Panel</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <input type="text" id="login-username" placeholder="Username" value="admin" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="login-password" placeholder="Password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <p class="login-error" id="login-error">Invalid credentials</p>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-wrapper" class="admin-wrapper">
+    <header class="admin-header">
+        <h1>📷 Kiro. Admin</h1>
+        <div>
+            <a href="/" style="margin-right: 1rem;">← Back to Site</a>
+            <a href="#" onclick="logout()" style="color: #ff6b6b;">Logout</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" data-tab="moments">Moments</button>
+            <button class="tab" data-tab="journals">Journals</button>
+            <button class="tab" data-tab="about">About</button>
+        </div>
+
+        <!-- Moments Panel -->
+        <div id="moments-panel" class="panel active">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Upload Photos</h2>
+                </div>
+                <div class="upload-zone" id="moments-upload">
+                    <input type="file" id="moments-files" multiple accept="image/*">
+                    <div>📁 Click or drag photos here</div>
+                    <p>Supports JPG, PNG</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h2>All Photos</h2>
+                    <span id="photo-count"></span>
+                </div>
+                <div class="photo-grid" id="moments-grid">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Panel -->
+        <div id="about-panel" class="panel">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Profile Photo</h2>
+                </div>
+                <div style="display: flex; gap: 1.5rem; align-items: center;">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; background: #eee; flex-shrink: 0;">
+                        <img id="profile-preview" src="/assets/profile.jpg" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="flex: 1;">
+                        <div class="upload-zone" id="profile-upload" style="padding: 1.5rem;">
+                            <input type="file" id="profile-file" accept="image/*">
+                            <div>📷 Click or drag to upload</div>
+                            <p style="font-size: 0.8rem;">JPG, PNG</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2>Basic Info</h2>
+                </div>
+                <form id="about-form">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="about-name" placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label>Bio (Paragraph 1)</label>
+                        <textarea id="about-bio" rows="3" placeholder="Introduction..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Bio (Paragraph 2)</label>
+                        <textarea id="about-bio2" rows="3" placeholder="More about you..."></textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2>Gear</h2>
+                    <button class="btn btn-small" onclick="addGearItem()">+ Add</button>
+                </div>
+                <div id="gear-list"></div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2>Social Links</h2>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="about-email" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Instagram Username</label>
+                    <input type="text" id="about-instagram" placeholder="username (without @)">
+                </div>
+                <div class="form-group">
+                    <label>X (Twitter) Username</label>
+                    <input type="text" id="about-twitter" placeholder="username (without @)">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="saveAbout()" style="width:100%; padding:1rem;">Save Changes</button>
+        </div>
+
+        <!-- Journals Panel -->
+        <div id="journals-panel" class="panel">
+            <div class="section">
+                <div class="section-header">
+                    <h2>All Journals</h2>
+                    <button class="btn btn-primary" onclick="showCreateJournalModal()">+ New Journal</button>
+                </div>
+                <div class="journal-list" id="journals-list">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Journal Modal -->
+    <div class="modal" id="journal-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">New Journal</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="journal-form">
+                <input type="hidden" id="journal-id-input">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="journal-title" required placeholder="Tokyo Wanderlust">
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="journal-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="journal-desc" placeholder="Write about this journey..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Journal Detail Modal -->
+    <div class="modal" id="journal-detail-modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2 id="detail-title">Journal Photos</h2>
+                <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div class="upload-zone" id="cover-upload" style="padding: 1.5rem;">
+                    <input type="file" id="cover-file" accept="image/*">
+                    <div>🖼️ Upload Cover</div>
+                    <p style="font-size: 0.8rem;">Single image</p>
+                </div>
+                <div class="upload-zone" id="journal-upload" style="padding: 1.5rem;">
+                    <input type="file" id="journal-files" multiple accept="image/*">
+                    <div>📁 Upload Photos</div>
+                    <p style="font-size: 0.8rem;">Multiple images</p>
+                </div>
+            </div>
+            
+            <h3 style="font-size: 0.9rem; color: #888; margin-bottom: 0.8rem;">Cover</h3>
+            <div class="photo-grid" id="journal-cover" style="margin-bottom: 1.5rem;"></div>
+            
+            <h3 style="font-size: 0.9rem; color: #888; margin-bottom: 0.8rem;">Photos</h3>
+            <div class="photo-grid" id="journal-photos"></div>
+        </div>
+    </div>
+
+    </div><!-- End admin-wrapper -->
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ==================== 认证 ====================
+        let authHeader = null;
+        
+        // 检查是否已登录
+        function checkAuth() {
+            const saved = sessionStorage.getItem('adminAuth');
+            if (saved) {
+                authHeader = saved;
+                showAdminPanel();
+                return true;
+            }
+            return false;
+        }
+
+        function showAdminPanel() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-wrapper').classList.add('active');
+            loadMoments();
+            loadJournals();
+            loadAbout();
+        }
+
+        function logout() {
+            sessionStorage.removeItem('adminAuth');
+            authHeader = null;
+            location.reload();
+        }
+
+        // 登录表单
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+            
+            authHeader = 'Basic ' + btoa(username + ':' + password);
+            
+            try {
+                const res = await fetch('/api/photos', {
+                    method: 'POST',
+                    headers: { 'Authorization': authHeader },
+                    body: new FormData()
+                });
+                
+                if (res.status === 401) {
+                    errorEl.style.display = 'block';
+                    authHeader = null;
+                    return;
+                }
+                
+                sessionStorage.setItem('adminAuth', authHeader);
+                errorEl.style.display = 'none';
+                showAdminPanel();
+            } catch (err) {
+                errorEl.style.display = 'block';
+            }
+        });
+
+        // 带认证的 fetch
+        function authFetch(url, options = {}) {
+            return fetch(url, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'Authorization': authHeader
+                }
+            });
+        }
+
+        // 初始化
+        if (!checkAuth()) {
+            document.getElementById('login-screen').style.display = 'flex';
+        }
+
+        let currentJournalId = null;
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab + '-panel').classList.add('active');
+            });
+        });
+
+        // Toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ==================== MOMENTS ====================
+
+        async function loadMoments() {
+            const grid = document.getElementById('moments-grid');
+            try {
+                const res = await fetch('/api/photos');
+                const photos = await res.json();
+                document.getElementById('photo-count').textContent = `${photos.length} photos`;
+                
+                if (photos.length === 0) {
+                    grid.innerHTML = '<p style="color:#888">No photos yet. Upload some!</p>';
+                    return;
+                }
+                
+                grid.innerHTML = photos.map(p => `
+                    <div class="photo-thumb">
+                        <img src="${p.url}" alt="">
+                        <button class="delete-btn" onclick="deleteMoment('${p.name}')">&times;</button>
+                    </div>
+                `).join('');
+            } catch (e) {
+                grid.innerHTML = '<p style="color:red">Error loading photos</p>';
+            }
+        }
+
+        async function deleteMoment(filename) {
+            if (!confirm('Delete this photo?')) return;
+            try {
+                await authFetch(`/api/photos/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+                showToast('Photo deleted');
+                loadMoments();
+            } catch (e) {
+                showToast('Error deleting photo');
+            }
+        }
+
+        // Moments upload
+        const momentsUpload = document.getElementById('moments-upload');
+        const momentsFiles = document.getElementById('moments-files');
+
+        momentsUpload.addEventListener('click', () => momentsFiles.click());
+        momentsUpload.addEventListener('dragover', e => { e.preventDefault(); momentsUpload.classList.add('dragover'); });
+        momentsUpload.addEventListener('dragleave', () => momentsUpload.classList.remove('dragover'));
+        momentsUpload.addEventListener('drop', e => {
+            e.preventDefault();
+            momentsUpload.classList.remove('dragover');
+            uploadMoments(e.dataTransfer.files);
+        });
+        momentsFiles.addEventListener('change', () => uploadMoments(momentsFiles.files));
+
+        async function uploadMoments(files) {
+            if (!files.length) return;
+            const formData = new FormData();
+            for (const file of files) formData.append('photos', file);
+            
+            try {
+                momentsUpload.innerHTML = '<div>Uploading...</div>';
+                await authFetch('/api/photos', { method: 'POST', body: formData });
+                showToast(`${files.length} photo(s) uploaded`);
+                loadMoments();
+            } catch (e) {
+                showToast('Upload failed');
+            }
+            momentsUpload.innerHTML = '<input type="file" id="moments-files" multiple accept="image/*"><div>📁 Click or drag photos here</div><p>Supports JPG, PNG</p>';
+        }
+
+        // ==================== JOURNALS ====================
+
+        async function loadJournals() {
+            const list = document.getElementById('journals-list');
+            try {
+                const res = await fetch('/api/journals');
+                const journals = await res.json();
+                
+                if (journals.length === 0) {
+                    list.innerHTML = '<p style="color:#888">No journals yet. Create one!</p>';
+                    return;
+                }
+                
+                list.innerHTML = journals.map(j => `
+                    <div class="journal-item">
+                        <img src="${j.cover || ''}" alt="" onerror="this.style.background='#ddd'">
+                        <div class="journal-item-info">
+                            <h3>${j.title}</h3>
+                            <p>${j.date} · ${j.id}</p>
+                        </div>
+                        <div class="journal-item-actions">
+                            <button class="btn btn-small" onclick="openJournalDetail('${j.id}')">Photos</button>
+                            <button class="btn btn-small" onclick="editJournal('${j.id}')">Edit</button>
+                            <button class="btn btn-small btn-danger" onclick="deleteJournal('${j.id}')">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                list.innerHTML = '<p style="color:red">Error loading journals</p>';
+            }
+        }
+
+        function generateFolderId(date, title) {
+            // 生成格式: 2025-01-tokyo-wanderlust
+            const slug = title.toLowerCase()
+                .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')  // 保留中英文和数字
+                .replace(/^-+|-+$/g, '')  // 去掉首尾连字符
+                .substring(0, 30);  // 限制长度
+            return `${date}-${slug || Date.now()}`;
+        }
+
+        function showCreateJournalModal() {
+            document.getElementById('modal-title').textContent = 'New Journal';
+            document.getElementById('journal-form').reset();
+            document.getElementById('journal-id-input').value = '';
+            document.getElementById('journal-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('journal-modal').classList.add('active');
+        }
+
+        async function editJournal(id) {
+            try {
+                const res = await fetch(`/api/journals/${id}`);
+                const j = await res.json();
+                
+                document.getElementById('modal-title').textContent = 'Edit Journal';
+                document.getElementById('journal-id-input').value = id;
+                document.getElementById('journal-title').value = j.title;
+                document.getElementById('journal-date').value = j.date;
+                document.getElementById('journal-desc').value = j.description;
+                document.getElementById('journal-modal').classList.add('active');
+            } catch (e) {
+                showToast('Error loading journal');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('journal-modal').classList.remove('active');
+        }
+
+        document.getElementById('journal-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const existingId = document.getElementById('journal-id-input').value;
+            const title = document.getElementById('journal-title').value;
+            const date = document.getElementById('journal-date').value;
+            const description = document.getElementById('journal-desc').value;
+            
+            // 自动生成 folder ID
+            const id = existingId || generateFolderId(date, title);
+            
+            const data = { id, title, date, description };
+
+            try {
+                if (existingId) {
+                    await authFetch(`/api/journals/${existingId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    showToast('Journal updated');
+                } else {
+                    await authFetch('/api/journals', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    showToast('Journal created');
+                }
+                closeModal();
+                loadJournals();
+            } catch (e) {
+                showToast('Error saving journal');
+            }
+        });
+
+        async function deleteJournal(id) {
+            if (!confirm(`Delete journal "${id}" and all its photos?`)) return;
+            try {
+                await authFetch(`/api/journals/${id}`, { method: 'DELETE' });
+                showToast('Journal deleted');
+                loadJournals();
+            } catch (e) {
+                showToast('Error deleting journal');
+            }
+        }
+
+        // Journal photos
+        async function openJournalDetail(id) {
+            currentJournalId = id;
+            document.getElementById('detail-title').textContent = id;
+            document.getElementById('journal-detail-modal').classList.add('active');
+            loadJournalPhotos(id);
+        }
+
+        function closeDetailModal() {
+            document.getElementById('journal-detail-modal').classList.remove('active');
+            currentJournalId = null;
+        }
+
+        async function loadJournalPhotos(id) {
+            const coverGrid = document.getElementById('journal-cover');
+            const photosGrid = document.getElementById('journal-photos');
+            try {
+                const res = await fetch(`/api/journals/${id}`);
+                const data = await res.json();
+                
+                // Cover
+                if (data.cover) {
+                    coverGrid.innerHTML = `
+                        <div class="photo-thumb">
+                            <img src="${data.cover}" alt="Cover">
+                        </div>
+                    `;
+                } else {
+                    coverGrid.innerHTML = '<p style="color:#888; font-size: 0.9rem;">No cover uploaded</p>';
+                }
+                
+                // Photos
+                if (data.photos && data.photos.length > 0) {
+                    photosGrid.innerHTML = data.photos.map(p => `
+                        <div class="photo-thumb">
+                            <img src="${p.url}" alt="">
+                            <button class="delete-btn" onclick="deleteJournalPhoto('${id}', '${p.name}')">&times;</button>
+                        </div>
+                    `).join('');
+                } else {
+                    photosGrid.innerHTML = '<p style="color:#888; font-size: 0.9rem;">No photos yet</p>';
+                }
+            } catch (e) {
+                coverGrid.innerHTML = '';
+                photosGrid.innerHTML = '<p style="color:red">Error loading photos</p>';
+            }
+        }
+
+        async function deleteJournalPhoto(journalId, filename) {
+            if (!confirm('Delete this photo?')) return;
+            try {
+                await authFetch(`/api/journals/${journalId}/photos/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+                showToast('Photo deleted');
+                loadJournalPhotos(journalId);
+            } catch (e) {
+                showToast('Error deleting photo');
+            }
+        }
+
+        // Cover upload
+        const coverUpload = document.getElementById('cover-upload');
+        const coverFile = document.getElementById('cover-file');
+
+        coverUpload.addEventListener('click', () => coverFile.click());
+        coverUpload.addEventListener('dragover', e => { e.preventDefault(); coverUpload.classList.add('dragover'); });
+        coverUpload.addEventListener('dragleave', () => coverUpload.classList.remove('dragover'));
+        coverUpload.addEventListener('drop', e => {
+            e.preventDefault();
+            coverUpload.classList.remove('dragover');
+            uploadCover(e.dataTransfer.files[0]);
+        });
+        coverFile.addEventListener('change', () => uploadCover(coverFile.files[0]));
+
+        async function uploadCover(file) {
+            if (!file || !currentJournalId) return;
+            const formData = new FormData();
+            formData.append('photos', file);
+            
+            try {
+                await authFetch(`/api/journals/${currentJournalId}/photos?type=cover`, { method: 'POST', body: formData });
+                showToast('Cover uploaded');
+                loadJournalPhotos(currentJournalId);
+            } catch (e) {
+                showToast('Upload failed');
+            }
+        }
+
+        // Journal photo upload
+        const journalUpload = document.getElementById('journal-upload');
+        const journalFiles = document.getElementById('journal-files');
+
+        journalUpload.addEventListener('click', () => journalFiles.click());
+        journalUpload.addEventListener('dragover', e => { e.preventDefault(); journalUpload.classList.add('dragover'); });
+        journalUpload.addEventListener('dragleave', () => journalUpload.classList.remove('dragover'));
+        journalUpload.addEventListener('drop', e => {
+            e.preventDefault();
+            journalUpload.classList.remove('dragover');
+            uploadJournalPhotos(e.dataTransfer.files);
+        });
+        journalFiles.addEventListener('change', () => uploadJournalPhotos(journalFiles.files));
+
+        async function uploadJournalPhotos(files) {
+            if (!files.length || !currentJournalId) return;
+            const formData = new FormData();
+            for (const file of files) formData.append('photos', file);
+            
+            try {
+                await authFetch(`/api/journals/${currentJournalId}/photos`, { method: 'POST', body: formData });
+                showToast(`${files.length} photo(s) uploaded`);
+                loadJournalPhotos(currentJournalId);
+            } catch (e) {
+                showToast('Upload failed');
+            }
+        }
+
+        // ==================== ABOUT ====================
+        
+        let aboutData = { gear: [] };
+
+        // Profile photo upload
+        const profileUpload = document.getElementById('profile-upload');
+        const profileFile = document.getElementById('profile-file');
+
+        profileUpload.addEventListener('click', () => profileFile.click());
+        profileUpload.addEventListener('dragover', e => { e.preventDefault(); profileUpload.classList.add('dragover'); });
+        profileUpload.addEventListener('dragleave', () => profileUpload.classList.remove('dragover'));
+        profileUpload.addEventListener('drop', e => {
+            e.preventDefault();
+            profileUpload.classList.remove('dragover');
+            uploadProfilePhoto(e.dataTransfer.files[0]);
+        });
+        profileFile.addEventListener('change', () => uploadProfilePhoto(profileFile.files[0]));
+
+        async function uploadProfilePhoto(file) {
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('photo', file);
+            
+            try {
+                const res = await authFetch('/api/about/photo', { method: 'POST', body: formData });
+                const data = await res.json();
+                document.getElementById('profile-preview').src = data.url;
+                showToast('Profile photo updated');
+            } catch (e) {
+                showToast('Upload failed');
+            }
+        }
+
+        async function loadAbout() {
+            try {
+                const res = await fetch('/api/about');
+                aboutData = await res.json();
+                
+                document.getElementById('about-name').value = aboutData.name || '';
+                document.getElementById('about-bio').value = aboutData.bio || '';
+                document.getElementById('about-bio2').value = aboutData.bio2 || '';
+                document.getElementById('about-email').value = aboutData.social?.email || '';
+                document.getElementById('about-instagram').value = aboutData.social?.instagram || '';
+                document.getElementById('about-twitter').value = aboutData.social?.twitter || '';
+                
+                renderGearList();
+            } catch (e) {
+                showToast('Error loading about info');
+            }
+        }
+
+        function renderGearList() {
+            const list = document.getElementById('gear-list');
+            if (!aboutData.gear || aboutData.gear.length === 0) {
+                list.innerHTML = '<p style="color:#888">No gear added yet</p>';
+                return;
+            }
+            
+            list.innerHTML = aboutData.gear.map((g, i) => `
+                <div class="gear-row" data-index="${i}" draggable="true"
+                     style="display:flex; gap:0.5rem; margin-bottom:0.5rem; align-items:center; padding:0.5rem; background:#fafafa; border-radius:6px; cursor:grab; transition: all 0.2s;">
+                    <span class="drag-handle" style="color:#999; font-size:1.2rem; padding:0 0.3rem; cursor:grab;">⋮⋮</span>
+                    <input type="text" value="${g.type}" placeholder="Type" 
+                           style="width:100px; padding:0.5rem; border:1px solid #ddd; border-radius:4px;"
+                           onchange="updateGear(${i}, 'type', this.value)">
+                    <input type="text" value="${g.name}" placeholder="Name" 
+                           style="flex:1; padding:0.5rem; border:1px solid #ddd; border-radius:4px;"
+                           onchange="updateGear(${i}, 'name', this.value)">
+                    <button class="btn btn-small btn-danger" onclick="removeGear(${i})">×</button>
+                </div>
+            `).join('');
+            
+            // 初始化拖拽
+            initGearDrag();
+        }
+        
+        // 拖拽排序功能
+        let draggedItem = null;
+        let draggedIndex = -1;
+        
+        function initGearDrag() {
+            const list = document.getElementById('gear-list');
+            const rows = list.querySelectorAll('.gear-row');
+            
+            rows.forEach(row => {
+                // 桌面端拖拽
+                row.addEventListener('dragstart', handleDragStart);
+                row.addEventListener('dragend', handleDragEnd);
+                row.addEventListener('dragover', handleDragOver);
+                row.addEventListener('drop', handleDrop);
+                
+                // 移动端触屏拖拽
+                row.addEventListener('touchstart', handleTouchStart, { passive: false });
+                row.addEventListener('touchmove', handleTouchMove, { passive: false });
+                row.addEventListener('touchend', handleTouchEnd);
+            });
+        }
+        
+        function handleDragStart(e) {
+            draggedItem = this;
+            draggedIndex = parseInt(this.dataset.index);
+            this.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        
+        function handleDragEnd(e) {
+            this.style.opacity = '1';
+            document.querySelectorAll('.gear-row').forEach(row => {
+                row.style.borderTop = '';
+                row.style.borderBottom = '';
+            });
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const targetIndex = parseInt(this.dataset.index);
+            document.querySelectorAll('.gear-row').forEach(row => {
+                row.style.borderTop = '';
+                row.style.borderBottom = '';
+            });
+            
+            if (targetIndex < draggedIndex) {
+                this.style.borderTop = '2px solid #1a1a1a';
+            } else if (targetIndex > draggedIndex) {
+                this.style.borderBottom = '2px solid #1a1a1a';
+            }
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            const targetIndex = parseInt(this.dataset.index);
+            
+            if (draggedIndex !== targetIndex) {
+                reorderGear(draggedIndex, targetIndex);
+            }
+        }
+        
+        // 触屏拖拽
+        let touchStartY = 0;
+        let touchCurrentRow = null;
+        let touchClone = null;
+        
+        function handleTouchStart(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+            
+            draggedItem = this;
+            draggedIndex = parseInt(this.dataset.index);
+            touchStartY = e.touches[0].clientY;
+            
+            // 创建拖拽副本
+            touchClone = this.cloneNode(true);
+            touchClone.style.position = 'fixed';
+            touchClone.style.zIndex = '9999';
+            touchClone.style.width = this.offsetWidth + 'px';
+            touchClone.style.opacity = '0.8';
+            touchClone.style.pointerEvents = 'none';
+            touchClone.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            document.body.appendChild(touchClone);
+            
+            this.style.opacity = '0.3';
+            
+            const rect = this.getBoundingClientRect();
+            touchClone.style.left = rect.left + 'px';
+            touchClone.style.top = rect.top + 'px';
+        }
+        
+        function handleTouchMove(e) {
+            if (!touchClone) return;
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            const rect = draggedItem.getBoundingClientRect();
+            touchClone.style.top = (touch.clientY - rect.height / 2) + 'px';
+            
+            // 找到当前悬停的行
+            const rows = document.querySelectorAll('.gear-row');
+            rows.forEach(row => {
+                row.style.borderTop = '';
+                row.style.borderBottom = '';
+                const rowRect = row.getBoundingClientRect();
+                const rowCenter = rowRect.top + rowRect.height / 2;
+                
+                if (touch.clientY > rowRect.top && touch.clientY < rowRect.bottom) {
+                    touchCurrentRow = row;
+                    const targetIndex = parseInt(row.dataset.index);
+                    if (targetIndex < draggedIndex) {
+                        row.style.borderTop = '2px solid #1a1a1a';
+                    } else if (targetIndex > draggedIndex) {
+                        row.style.borderBottom = '2px solid #1a1a1a';
+                    }
+                }
+            });
+        }
+        
+        function handleTouchEnd(e) {
+            if (!touchClone) return;
+            
+            document.body.removeChild(touchClone);
+            touchClone = null;
+            draggedItem.style.opacity = '1';
+            
+            document.querySelectorAll('.gear-row').forEach(row => {
+                row.style.borderTop = '';
+                row.style.borderBottom = '';
+            });
+            
+            if (touchCurrentRow && touchCurrentRow !== draggedItem) {
+                const targetIndex = parseInt(touchCurrentRow.dataset.index);
+                reorderGear(draggedIndex, targetIndex);
+            }
+            
+            touchCurrentRow = null;
+        }
+        
+        function reorderGear(fromIndex, toIndex) {
+            const item = aboutData.gear.splice(fromIndex, 1)[0];
+            aboutData.gear.splice(toIndex, 0, item);
+            renderGearList();
+        }
+
+        function addGearItem() {
+            if (!aboutData.gear) aboutData.gear = [];
+            aboutData.gear.push({ type: '', name: '' });
+            renderGearList();
+        }
+
+        function updateGear(index, field, value) {
+            aboutData.gear[index][field] = value;
+        }
+
+        function removeGear(index) {
+            aboutData.gear.splice(index, 1);
+            renderGearList();
+        }
+
+        async function saveAbout() {
+            const data = {
+                name: document.getElementById('about-name').value,
+                bio: document.getElementById('about-bio').value,
+                bio2: document.getElementById('about-bio2').value,
+                gear: aboutData.gear.filter(g => g.type || g.name),
+                social: {
+                    email: document.getElementById('about-email').value,
+                    instagram: document.getElementById('about-instagram').value,
+                    twitter: document.getElementById('about-twitter').value
+                }
+            };
+
+            try {
+                await authFetch('/api/about', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                aboutData = data;
+                showToast('About info saved');
+            } catch (e) {
+                showToast('Error saving about info');
+            }
+        }
+
+    </script>
+</body>
+</html>
+

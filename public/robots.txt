@@ -1,0 +1,11 @@
+# Robots.txt for Kiro. Photo Journal
+
+User-agent: *
+Allow: /
+
+# Disallow admin panel
+Disallow: /admin.html
+
+# Sitemap (update with your actual domain)
+# Sitemap: https://yourdomain.com/sitemap.xml
+

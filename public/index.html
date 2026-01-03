@@ -377,19 +377,6 @@
             overflow: hidden;
         }
 
-        .read-more {
-            margin-top: 2rem;
-            display: inline-block;
-            font-size: 0.85rem;
-            color: var(--text-main);
-            text-decoration: none;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 2px;
-            transition: border-color 0.3s;
-        }
-
-        .journal-entry:hover .read-more { border-bottom-color: var(--text-main); }
-
         /* ==================== Journal Detail ==================== */
         .journal-detail {
             max-width: 1200px;
@@ -641,7 +628,6 @@
             .journal-date { margin-bottom: 0.5rem; font-size: 0.75rem; }
             .journal-title { font-size: 1.6rem; margin-bottom: 0.8rem; }
             .journal-desc { font-size: 0.9rem; -webkit-line-clamp: 2; }
-            .read-more { margin-top: 1rem; font-size: 0.8rem; }
             
             /* Journal detail mobile */
             .journal-hero { height: 45vh; min-height: 280px; }
@@ -1022,6 +1008,15 @@
                 this.handleHash();
             }
 
+            // 统一日期格式 yyyy/mm/dd
+            formatDate(dateStr) {
+                const d = new Date(dateStr);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}/${month}/${day}`;
+            }
+
             handleHash() {
                 const hash = window.location.hash.substring(1) || 'journal';
                 const parts = hash.split('/');
@@ -1093,7 +1088,7 @@
                                 <div class="photo-item" data-photo-index="${index}">
                                     <img src="${photo.url}" loading="lazy" alt="">
                                     <div class="photo-overlay">
-                                        <div class="date">${new Date(photo.dateTaken).toLocaleDateString('zh-CN', {year: 'numeric', month: 'short', day: 'numeric'})}</div>
+                                        <div class="date">${this.formatDate(photo.dateTaken)}</div>
                                         <div class="camera">${photo.camera}</div>
                                     </div>
                                 </div>
@@ -1129,7 +1124,7 @@
             updateLightbox() {
                 const photo = this.photos[this.currentPhotoIndex];
                 document.getElementById('lightbox-img').src = photo.url;
-                document.getElementById('lb-date').textContent = new Date(photo.dateTaken).toLocaleDateString('zh-CN', {year: 'numeric', month: 'long', day: 'numeric'});
+                document.getElementById('lb-date').textContent = this.formatDate(photo.dateTaken);
                 document.getElementById('lb-camera').textContent = `${photo.camera}${photo.lens ? ' · ' + photo.lens : ''}`;
             }
 
@@ -1166,10 +1161,9 @@
                                         <img src="${journal.cover}" alt="${journal.title}">
                                     </div>
                                     <div class="journal-info">
-                                        <span class="journal-date">${new Date(journal.date).toLocaleDateString('zh-CN', {year: 'numeric', month: 'long'})}</span>
+                                        <span class="journal-date">${this.formatDate(journal.date)}</span>
                                         <h2 class="journal-title">${journal.title}</h2>
                                         <p class="journal-desc">${journal.description}</p>
-                                        <span class="read-more">Read Story</span>
                                     </div>
                                 </article>
                             `).join('')}
@@ -1209,7 +1203,7 @@
                             <div class="journal-hero">
                                 <img src="${heroImage}" alt="${data.title}">
                                 <div class="journal-hero-overlay">
-                                    <div class="journal-hero-meta">${new Date(data.date).toLocaleDateString('zh-CN', {year: 'numeric', month: 'long', day: 'numeric'})}</div>
+                                    <div class="journal-hero-meta">${this.formatDate(data.date)}</div>
                                     <h1 class="journal-hero-title">${data.title}</h1>
                                 </div>
                             </div>
@@ -1225,7 +1219,7 @@
                                     <div class="photo-item" data-photo-index="${index}">
                                         <img src="${photo.url}" loading="lazy" alt="">
                                         <div class="photo-overlay">
-                                            <div class="date">${new Date(photo.dateTaken).toLocaleDateString('zh-CN', {month: 'short', day: 'numeric'})}</div>
+                                            <div class="date">${this.formatDate(photo.dateTaken)}</div>
                                         </div>
                                     </div>
                                 `).join('')}
